@@ -3,7 +3,7 @@ module.exports = {
     entry: "./src/index.js",
     output: {
         path: __dirname + '/dist',
-        filename: 'ingestly.js'
+        filename: 'td-js-sdk-ext.js'
     },
     module: {
         rules: [

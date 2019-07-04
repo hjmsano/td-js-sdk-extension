@@ -1,3 +1,3 @@
-import Ingestly from './ingestly';
-const nameSpace = 'Ingestly';
-window[nameSpace] = new Ingestly();
+import TDExt from './id-js-sdk-ext';
+const nameSpace = 'TDExt';
+window[nameSpace] = new TDExt();

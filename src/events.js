@@ -10,21 +10,21 @@ export default class {
         try {
             event = new CustomEvent(config.eventName);
         } catch (e) {
-            event = window.parent.document.createEvent('CustomEvent');
+            event = window[config.targetWindow].document.createEvent('CustomEvent');
             event.initCustomEvent(config.eventName, false, false, {});
         }
 
-        window.parent.requestAnimationFrame = window.parent.requestAnimationFrame
-            || window.parent.mozRequestAnimationFrame
-            || window.parent.webkitRequestAnimationFrame;
+        window[config.targetWindow].requestAnimationFrame = window[config.targetWindow].requestAnimationFrame
+            || window[config.targetWindow].mozRequestAnimationFrame
+            || window[config.targetWindow].webkitRequestAnimationFrame;
 
         (function recurringEvent() {
-            window.parent.requestAnimationFrame(recurringEvent);
+            window[config.targetWindow].requestAnimationFrame(recurringEvent);
             if (timer) {
                 return false;
             }
             timer = setTimeout( () => {
-                window.parent.dispatchEvent(event);
+                window[config.targetWindow].dispatchEvent(event);
                 timer = null;
             }, config.eventFrequency);
         })();

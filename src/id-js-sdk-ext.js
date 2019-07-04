@@ -1,71 +1,38 @@
-import Emitter from './emitter';
 import Events from './events';
-import IDM from './idm';
 import Utils from './utils';
 
 const
-    sdkName = 'JS',
-    sdkVersion = '0.5.0',
     initTimestamp = new Date();
 
-let config, targetWindow, idm, emitter, events, utils, parsedUrl, parsedReferrer,
+let config, targetWindow, tdNs, events, utils,
     eventHandlerKeys = {media: []},
     prevTimestamp = new Date();
 
 /**
  * @ignore
  */
-export default class Ingestly {
+export default class TDExt {
 
     constructor() {
-        this.dataModel = {};
-        this.trackReadTargets = [];
-    }
 
-    /**
-     * Configure Ingestly SDK.
-     * @param  {Object} configObj Configuration variables.
-     */
-    config(configObj) {
-        config = configObj;
-        utils = new Utils();
-        idm = new IDM({
-            prefix: config.prefix,
-            target: config.targetWindow
-        });
-        emitter = new Emitter({
-            endpoint: config.endpoint,
-            apiKey: config.apiKey,
-            sdkName: sdkName,
-            sdkVersion: sdkVersion,
-            deviceId: idm.deviceId,
-            rootId: idm.rootId,
-            target: config.targetWindow
-        });
-        targetWindow = config.targetWindow;
-        parsedUrl = utils.parseUrl(window[targetWindow].document.location.href);
-        parsedReferrer = utils.parseUrl(window[targetWindow].document.referrer);
     }
 
     /**
      * Initialize a page level variables.
-     * @param  {Object} dataModel Data model.
      */
-    init(dataModel) {
+    init(configObj) {
+        config = configObj;
+        utils = new Utils();
+        targetWindow = config.targetWindow || 'self';
+        tdNs = config.tdNs || 'td';
 
-        this.dataModel = dataModel;
-
-        for(let key in parsedUrl){
-            this.dataModel[`ur${key}`] = parsedUrl[key];
-        }
-        for(let key in parsedReferrer){
-            this.dataModel[`rf${key}`] = parsedReferrer[key];
-        }
+        window[targetWindow][tdNs].set('$global', 'root_id', utils.generateId());
 
         if (config.eventName && config.eventFrequency && typeof events === 'undefined') {
             events = new Events({
                 eventName: config.eventName,
-                eventFrequency: config.eventFrequency
+                eventFrequency: config.eventFrequency,
+                targetWindow: targetWindow
             });
         }
 
@@ -78,7 +45,7 @@ export default class Ingestly {
         }
 
         if (config.options && config.options.unload && config.options.unload.enable) {
-            this.trackUnload(targetWindow);
+            this.trackUnload();
         }
 
         if (config.options && config.options.scroll && config.options.scroll.enable) {
@@ -86,8 +53,7 @@ export default class Ingestly {
         }
 
         if (config.options && config.options.read && config.options.read.enable) {
-            this.trackReadTargets = [].slice.call(config.options.read.targets);
-            this.trackRead();
+            this.trackRead(config.options.read.target);
         }
 
         if (config.options && config.options.clicks && config.options.clicks.enable) {
@@ -100,46 +66,31 @@ export default class Ingestly {
     }
 
     /**
-     * Track an event with additional data.
-     * @param  {String} action Action name.
-     * @param  {String} category Category name.
-     * @param  {Object} eventContext Additional data.
+     * Send a payload to TD endpoint.
+     *
      */
-    trackAction(action = 'unknown', category = 'unknown', eventContext = {}) {
-        const now = new Date();
-        const mandatory = {
-            action: action,
-            category: category,
-            sinceInitMs: now.getTime() - initTimestamp.getTime(),
-            sincePrevMs: now.getTime() - prevTimestamp.getTime()
-        };
-        const payload = utils.mergeObj([
-            this.dataModel,
-            mandatory,
-            eventContext,
-            utils.getPerformanceInfo(),
-            utils.getClientInfo(targetWindow)
-        ]);
+    trackAction(action = 'unknown', category = 'unknown', context = {}) {
+        const
+            now = new Date(),
+            mandatory = {
+                action: action,
+                category: category,
+                since_init_ms: now.getTime() - initTimestamp.getTime(),
+                since_prev_ms: now.getTime() - prevTimestamp.getTime()
+            },
+            payload = utils.mergeObj([
+                mandatory,
+                context,
+                utils.getPerformanceInfo()
+            ]);
         prevTimestamp = now;
-        emitter.emit(payload);
-
-        if (idm.isNewId) {
-            emitter.getDeviceId((result) => {
-                idm.setDeviceId(result);
-                idm.isNewId = false;
-            });
-        } else {
-            idm.setDeviceId(idm.deviceId);
-        }
+        window[targetWindow][tdNs].trackEvent(config.table, payload);
     }
 
-    /**
-     * Track a pageview event.
-     * @param  {Object} eventContext Additional data.
-     */
-    trackPage(eventContext = {}) {
-        this.trackAction('view', 'page', eventContext);
+    trackPageview(){
+        this.trackAction('view','page');
     }
+
 
     /**
      * Add a tracker to the onload event.
@@ -181,13 +132,13 @@ export default class Ingestly {
             if (trackableElement) {
                 element = trackableElement.element;
                 this.trackAction('click', trackableElement.category, {
-                    clTag: element.tagName,
-                    clId: element.id || undefined,
-                    clClass: element.className || undefined,
-                    clPath: trackableElement.path || undefined,
-                    clLink: element.href || undefined,
-                    clText: element.innerText || element.value || undefined,
-                    clAttr: element.dataset || undefined
+                    click_tag: element.tagName,
+                    click_id: element.id || undefined,
+                    click_class: element.className || undefined,
+                    click_path: trackableElement.path || undefined,
+                    click_link: element.href || undefined,
+                    click_text: element.innerText || element.value || undefined,
+                    click_attr: element.dataset ? JSON.stringify(element.dataset) : undefined
                 });
             }
         }, false);
@@ -217,9 +168,9 @@ export default class Ingestly {
                     setTimeout(() => {
                         if (currentVal > prevVal) {
                             this.trackAction('scroll', 'page', {
-                                pgH: result.dHeight,
-                                srDepth: currentVal,
-                                srUnit: scrollUnit
+                                page_height: result.dHeight,
+                                scroll_depth: currentVal,
+                                scroll_unit: scrollUnit
                             });
                             prevVal = (scrollUnit === 'percent') ? currentVal : currentVal + each;
                         }
@@ -231,44 +182,38 @@ export default class Ingestly {
 
     /**
      * Start Read-Through Rate observation by using custom event
+     * @param  {Element} target A target element to be observed for Read-Through.
      */
-    trackRead() {
-        if (!this.trackReadTargets || this.trackReadTargets.length === 0) {
+    trackRead(target) {
+        if (!target) {
             return;
         }
         const each = config.options.read.granularity || 20;
         const steps = 100 / each;
         const limit = config.options.read.threshold * 1000 || 2 * 1000;
-        let results = [], currentVals = [], prevVals = [];
+        let result, currentVal, prevVal;
         events.removeListener(eventHandlerKeys['read']);
         eventHandlerKeys['read'] = events.addListener(window[targetWindow], config.eventName, () => {
-            for (let i = 0; i < this.trackReadTargets.length; i++) {
-                currentVals[i] = currentVals[i] || 0;
-                prevVals[i] = prevVals[i] || 0;
-                results[i] = utils.getVisibility(this.trackReadTargets[i], targetWindow);
-                if (results[i].dIsVisible !== 'hidden' && results[i].dIsVisible !== 'prerender' && results[i].tIsInView) {
-                    currentVals[i] = Math.floor(results[i].tScrollRate * steps) * each;
-                    if (currentVals[i] > prevVals[i] && currentVals[i] >= 0 && currentVals[i] <= 100) {
-                        setTimeout(() => {
-                            if (currentVals[i] > prevVals[i] && this.trackReadTargets[i]) {
-                                this.trackAction('read', 'content', {
-                                    rdIdx: i,
-                                    rdId: this.trackReadTargets[i].id || undefined,
-                                    rdTxS: this.trackReadTargets[i].innerText.substring(0, 12) || undefined,
-                                    rdTgH: results[i].tHeight,
-                                    rdTxL: results[i].tLength,
-                                    rdRate: currentVals[i],
-                                    rdAttr: this.trackReadTargets[i].dataset || undefined
-                                });
-                                if (currentVals[i] === 100) {
-                                    this.trackReadTargets.splice(i, 1);
-                                }
-                                prevVals[i] = currentVals[i];
-                            }
-                        }, limit);
-                    }
+            currentVal = currentVal || 0;
+            prevVal = prevVal || 0;
+            result = utils.getVisibility(target, targetWindow);
+            if (result.dIsVisible !== 'hidden' && result.dIsVisible !== 'prerender' && result.tIsInView) {
+                currentVal = Math.floor(result.tScrollRate * steps) * each;
+                if (currentVal > prevVal && currentVal >= 0 && currentVal <= 100) {
+                    setTimeout(() => {
+                        if (currentVal > prevVal && target) {
+                            this.trackAction('read', 'content', {
+                                read_id: target.id || undefined,
+                                read_start_with: target.innerText.substring(0, 12) || undefined,
+                                read_target_height: result.tHeight,
+                                read_text_length: result.tLength,
+                                read_rate: currentVal,
+                                read_attr: target.dataset ? JSON.stringify(target.dataset) : undefined
+                            });
+                            prevVal = currentVal;
+                        }
+                    }, limit);
                 }
-
             }
         }, false);
     }
@@ -299,15 +244,5 @@ export default class Ingestly {
                 flags[event.target.src] = false;
             }, heartbeat * 1000);
         }, {capture: true});
-    }
-
-
-    /**
-     * Get a value for specified key name in GET parameter.
-     * @param  {String} key A key name.
-     * @return {String} A value for the specified key.
-     */
-    getQueryVal(key) {
-        return parsedUrl.Query[key] ? parsedUrl.Query[key] : '';
     }
 }

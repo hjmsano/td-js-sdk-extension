@@ -1,7 +1,7 @@
 {
-  "name": "ingestly-client-javascript",
-  "version": "0.5.0",
-  "description": "Ingestly Client JavaScript SDK for modern web analytics.",
+  "name": "td-js-sdk-extension",
+  "version": "0.1.0",
+  "description": "Extension Pack for TD-JS-SDK",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "webpack",
@@ -10,14 +10,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ingestly/ingestly-client-javascript.git"
+    "url": "git+https://github.com/hjmsano/td-js-sdk-extension.git"
   },
-  "author": "Ingestly Project",
+  "author": "Hajime Sano",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/ingestly/ingestly-client-javascript/issues"
+    "url": "https://github.com/hjmsano/td-js-sdk-extension/issues"
   },
-  "homepage": "https://github.com/ingestly/ingestly-client-javascript#readme",
+  "homepage": "https://github.com/hjmsano/td-js-sdk-extension#readme",
   "dependencies": {},
   "devDependencies": {
     "@babel/core": "^7.4.5",
