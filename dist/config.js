@@ -3,7 +3,6 @@ var td = new Treasure({
     database: 'your_db_name',
     writeKey: 'your_api_write_key'
 });
-td.setSignedMode();
 
 // Track everything by TD JS SDK Extension
 (function () {
@@ -11,6 +10,9 @@ td.setSignedMode();
     if ('addEventListener' in window &&
         'td' in window
     ) {
+        // Enable signedMode
+        td.setSignedMode();
+
         // Init TD Extension
         TDExt.init({
             table: 'weblog',
