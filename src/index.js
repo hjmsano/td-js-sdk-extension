@@ -1,3 +1,3 @@
-import TDExt from './id-js-sdk-ext';
+import TDExt from './td-js-sdk-ext';
 const nameSpace = 'TDExt';
 window[nameSpace] = new TDExt();

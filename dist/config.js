@@ -1,15 +1,14 @@
 // Init TD JS SDK
 var td = new Treasure({
-    database: 'YOUR_DB_NAME',
-    writeKey: 'YOUR_API_WRITE_KEY'
+    database: 'your_db_name',
+    writeKey: 'your_api_write_key'
 });
 td.setSignedMode();
 
 // Track everything by TD JS SDK Extension
 (function () {
     // Cut the mustard
-    if ('querySelector' in window.document &&
-        'addEventListener' in window &&
+    if ('addEventListener' in window &&
         'td' in window
     ) {
         // Init TD Extension
