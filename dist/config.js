@@ -8,13 +8,14 @@ var td = new Treasure({
 (function () {
     // Cut the mustard
     if ('addEventListener' in window &&
-        'td' in window
+        'td' in window &&
+        'tdext' in window
     ) {
         // Enable signedMode
         td.setSignedMode();
 
         // Init TD Extension
-        TDExt.init({
+        tdext.init({
             table: 'weblog',
             eventName: 'TDExtRecurringEvent',
             eventFrequency: 250,
@@ -48,6 +49,6 @@ var td = new Treasure({
         });
 
         // Track PV
-        TDExt.trackPageview();
+        tdext.trackPageview();
     }
 }());
