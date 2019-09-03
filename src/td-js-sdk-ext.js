@@ -2,11 +2,11 @@ import Events from './events';
 import Utils from './utils';
 
 const
-    initTimestamp = new Date();
+    initTimestamp = +new Date();
 
 let config, targetWindow, tdNs, events, utils,
     eventHandlerKeys = {media: []},
-    prevTimestamp = new Date();
+    prevTimestamp = +new Date();
 
 /**
  * @ignore
@@ -75,8 +75,8 @@ export default class TDExt {
             mandatory = {
                 action: action,
                 category: category,
-                since_init_ms: now.getTime() - initTimestamp.getTime(),
-                since_prev_ms: now.getTime() - prevTimestamp.getTime()
+                since_init_ms: now - initTimestamp,
+                since_prev_ms: now - prevTimestamp
             },
             payload = utils.mergeObj([
                 mandatory,
@@ -191,6 +191,7 @@ export default class TDExt {
         const each = config.options.read.granularity || 20;
         const steps = 100 / each;
         const limit = config.options.read.threshold * 1000 || 2 * 1000;
+        const start = +new Date();
         let result, currentVal, prevVal;
         events.removeListener(eventHandlerKeys['read']);
         eventHandlerKeys['read'] = events.addListener(window[targetWindow], config.eventName, () => {
@@ -208,7 +209,8 @@ export default class TDExt {
                                 read_target_height: result.tHeight,
                                 read_text_length: result.tLength,
                                 read_rate: currentVal,
-                                read_attr: target.dataset ? JSON.stringify(target.dataset) : undefined
+                                read_attr: target.dataset ? JSON.stringify(target.dataset) : undefined,
+                                read_elapsed_ms: (+new Date()) - start
                             });
                             prevVal = currentVal;
                         }
