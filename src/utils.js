@@ -61,6 +61,34 @@ export default class {
         }
     }
 
+    getFormStats(formDetail, targetEvent, targetElement, initTimestamp) {
+        const elementName = targetElement.name || targetElement.id || '-';
+        let valueLength = 0;
+        if (targetElement.tagName.toLowerCase() === 'select') {
+            for (let i = 0; i < targetElement.length; i++) {
+                targetElement[i].selected ? valueLength++ : false;
+            }
+        } else if (targetElement.tagName.toLowerCase() === 'input' && (targetElement.type === 'checkbox' || targetElement.type === 'radio')) {
+            valueLength = targetElement.checked ? 1 : 0;
+        } else {
+            valueLength = targetElement.value.length;
+        }
+        if (targetElement.type !== 'hidden') {
+            formDetail.fmItems[elementName] = {
+                'status': targetEvent,
+                'length': valueLength
+            };
+        }
+        if (!formDetail.fmFirstItem) {
+            formDetail.fmFirstItem = targetElement.name || targetElement.id || '-';
+            formDetail.fmStartedSinceInitMs = +new Date - initTimestamp;
+        }
+        formDetail.fmLastItem = targetElement.name || targetElement.id || '-';
+        formDetail.fmEndedSinceInitMs = +new Date - initTimestamp;
+        formDetail.fmDurationMs = formDetail.fmEndedSinceInitMs - formDetail.fmStartedSinceInitMs;
+        return formDetail;
+    }
+
     getVisibility(targetElement, targetWindow) {
         let textLength = 0, targetRect = {};
         try {

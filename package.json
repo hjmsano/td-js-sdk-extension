@@ -1,6 +1,6 @@
 {
   "name": "td-js-sdk-extension",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Extension Pack for TD-JS-SDK",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",

@@ -4,7 +4,7 @@ import Utils from './utils';
 const
     initTimestamp = +new Date();
 
-let config, targetWindow, tdNs, events, utils,
+let config, targetWindow, tdNs, events, utils, unloadEvent,
     eventHandlerKeys = {media: []},
     prevTimestamp = +new Date();
 
@@ -14,7 +14,13 @@ let config, targetWindow, tdNs, events, utils,
 export default class TDExt {
 
     constructor() {
-
+        if ('onbeforeunload' in window[targetWindow]) {
+            unloadEvent = 'beforeunload';
+        } else if ('onpagehide' in window[targetWindow]) {
+            unloadEvent = 'pagehide';
+        } else {
+            unloadEvent = 'unload';
+        }
     }
 
     /**
@@ -106,14 +112,6 @@ export default class TDExt {
      * Add a tracker to the unload event.
      */
     trackUnload() {
-        let unloadEvent;
-        if ('onbeforeunload' in window[targetWindow]) {
-            unloadEvent = 'beforeunload';
-        } else if ('onpagehide' in window[targetWindow]) {
-            unloadEvent = 'pagehide';
-        } else {
-            unloadEvent = 'unload';
-        }
         events.removeListener(eventHandlerKeys['unload']);
         eventHandlerKeys['unload'] = events.addListener(window[targetWindow], unloadEvent, () => {
             this.trackAction('unload', 'page', {});
@@ -247,4 +245,32 @@ export default class TDExt {
             }, heartbeat * 1000);
         }, {capture: true});
     }
+
+    /**
+     * Measure stats for form completion
+     */
+    trackForm() {
+        if (!this.trackFormTargets || this.trackFormTargets.length === 0) {
+            return;
+        }
+        const targetEvents = ['focus', 'change'];
+        for (let i = 0; i < this.trackFormTargets.length; i++) {
+            let formDetail = {
+                'fmName': this.trackFormTargets[i].name || this.trackFormTargets[i].id || '-',
+                'fmAttr': this.trackFormTargets[i].dataset,
+                'fmItems': {}
+            };
+            for (let j = 0; j < targetEvents.length; j++) {
+                events.removeListener(eventHandlerKeys['form'][targetEvents[j]]);
+                eventHandlerKeys['form'][targetEvents[j]] = events.addListener(this.trackFormTargets[i], targetEvents[j], (event) => {
+                    formDetail = utils.getFormStats(formDetail, targetEvents[j], event.target, initTimestamp);
+                }, true);
+            }
+            events.removeListener(eventHandlerKeys['unload']);
+            eventHandlerKeys['unload'] = events.addListener(window[targetWindow], unloadEvent, () => {
+                this.trackAction('stats', 'form', formDetail);
+            }, false);
+        }
+    }
+
 }
