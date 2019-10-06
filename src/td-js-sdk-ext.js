@@ -256,9 +256,9 @@ export default class TDExt {
         const targetEvents = ['focus', 'change'];
         for (let i = 0; i < this.trackFormTargets.length; i++) {
             let formDetail = {
-                'fmName': this.trackFormTargets[i].name || this.trackFormTargets[i].id || '-',
-                'fmAttr': this.trackFormTargets[i].dataset,
-                'fmItems': {}
+                'form_name': this.trackFormTargets[i].name || this.trackFormTargets[i].id || '-',
+                'form_attr': this.trackFormTargets[i].dataset,
+                'form_items': {}
             };
             for (let j = 0; j < targetEvents.length; j++) {
                 events.removeListener(eventHandlerKeys['form'][targetEvents[j]]);
