@@ -1,7 +1,9 @@
 // Init TD JS SDK
 var td = new Treasure({
     database: 'your_db_name',
-    writeKey: 'your_api_write_key'
+    writeKey: 'your_api_write_key',
+    host: 'in.treasuredata.com',
+    startInSignedMode: true
 });
 
 // Track everything by TD JS SDK Extension
@@ -11,48 +13,48 @@ var td = new Treasure({
         'td' in window &&
         'tdext' in window
     ) {
-        // Enable signedMode
-        td.setSignedMode();
-
-        // Init TD Extension
-        tdext.init({
-            table: 'weblog',
-            eventName: 'TDExtRecurringEvent',
-            eventFrequency: 250,
-            targetWindow: 'self',
-            tdNs: 'td',
-            options: {
-                unload: {
-                    enable: true
-                },
-                clicks: {
-                    enable: true,
-                    targetAttr: 'data-trackable'
-                },
-                scroll: {
-                    enable: true,
-                    threshold: 2,
-                    granularity: 20,
-                    unit: 'percent'
-                },
-                read: {
-                    enable: true,
-                    threshold: 2,
-                    granularity: 20,
-                    target: window.document.getElementById('article')
-                },
-                media: {
-                    enable: true,
-                    heartbeat: 5
-                },
-                form: {
-                    enable: true,
-                    targets: [].slice.call(window.document.getElementsByTagName('form'))
+        // Wait for TD-JS-SDK is ready
+        td.ready(function(){
+            // Init TD Extension
+            tdext.init({
+                table: 'weblog',
+                eventName: 'TDExtRecurringEvent',
+                eventFrequency: 250,
+                targetWindow: 'self',
+                tdNs: 'td',
+                options: {
+                    unload: {
+                        enable: true
+                    },
+                    clicks: {
+                        enable: true,
+                        targetAttr: 'data-trackable'
+                    },
+                    scroll: {
+                        enable: true,
+                        threshold: 2,
+                        granularity: 20,
+                        unit: 'percent'
+                    },
+                    read: {
+                        enable: true,
+                        threshold: 2,
+                        granularity: 20,
+                        target: window.document.getElementById('article')
+                    },
+                    media: {
+                        enable: true,
+                        heartbeat: 5
+                    },
+                    form: {
+                        enable: true,
+                        targets: [].slice.call(window.document.getElementsByTagName('form'))
+                    }
                 }
-            }
-        });
+            });
 
-        // Track PV
-        tdext.trackPageview();
+            // Track PV
+            tdext.trackPageview();
+        });
     }
 }());

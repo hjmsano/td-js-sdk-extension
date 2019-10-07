@@ -14,13 +14,7 @@ let config, targetWindow, tdNs, events, utils, unloadEvent,
 export default class TDExt {
 
     constructor() {
-        if ('onbeforeunload' in window[targetWindow]) {
-            unloadEvent = 'beforeunload';
-        } else if ('onpagehide' in window[targetWindow]) {
-            unloadEvent = 'pagehide';
-        } else {
-            unloadEvent = 'unload';
-        }
+
     }
 
     /**
@@ -31,6 +25,14 @@ export default class TDExt {
         utils = new Utils();
         targetWindow = config.targetWindow || 'self';
         tdNs = config.tdNs || 'td';
+
+        if ('onbeforeunload' in window[targetWindow]) {
+            unloadEvent = 'beforeunload';
+        } else if ('onpagehide' in window[targetWindow]) {
+            unloadEvent = 'pagehide';
+        } else {
+            unloadEvent = 'unload';
+        }
 
         window[targetWindow][tdNs].set('$global', 'root_id', utils.generateId());
 
@@ -272,5 +274,4 @@ export default class TDExt {
             }, false);
         }
     }
-
 }
