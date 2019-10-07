@@ -45,6 +45,7 @@ First of all, see `/example/index.html`. It helps you to understand the installa
 |`pause`|`audio`||
 |`timeupdate`|`audio`||
 |`ended`|`audio`||
+|`stats`|`form`|A record for Form Analysis. The data is sent on `unload` event.|
 |`answer`|`survey`|If you are using [TD-Survey](https://github.com/hjmsano/td-survey), the survey result will be recorded with these action/category pair.|
 
 
