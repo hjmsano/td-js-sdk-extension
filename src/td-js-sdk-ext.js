@@ -2,6 +2,7 @@ import Events from './events';
 import Utils from './utils';
 
 const
+    extVersion = '0.1.3',
     initTimestamp = +new Date();
 
 let config, targetWindow, tdNs, events, utils, unloadEvent,
@@ -14,7 +15,6 @@ let config, targetWindow, tdNs, events, utils, unloadEvent,
 export default class TDExt {
 
     constructor() {
-
     }
 
     /**
@@ -25,6 +25,7 @@ export default class TDExt {
         utils = new Utils();
         targetWindow = config.targetWindow || 'self';
         tdNs = config.tdNs || 'td';
+        this.rootId = utils.generateId();
 
         if ('onbeforeunload' in window[targetWindow]) {
             unloadEvent = 'beforeunload';
@@ -33,8 +34,6 @@ export default class TDExt {
         } else {
             unloadEvent = 'unload';
         }
-
-        window[targetWindow][tdNs].set('$global', 'root_id', utils.generateId());
 
         if (config.eventName && config.eventFrequency && typeof events === 'undefined') {
             events = new Events({
@@ -83,6 +82,8 @@ export default class TDExt {
             mandatory = {
                 action: action,
                 category: category,
+                root_id: this.rootId,
+                ext_version: extVersion,
                 since_init_ms: now - initTimestamp,
                 since_prev_ms: now - prevTimestamp
             },
@@ -95,8 +96,8 @@ export default class TDExt {
         window[targetWindow][tdNs].trackEvent(config.table, payload);
     }
 
-    trackPageview(){
-        this.trackAction('view','page');
+    trackPageview() {
+        this.trackAction('view', 'page');
     }
 
 

@@ -13,48 +13,48 @@ var td = new Treasure({
         'td' in window &&
         'tdext' in window
     ) {
-        // Wait for TD-JS-SDK is ready
-        td.ready(function(){
-            // Init TD Extension
-            tdext.init({
-                table: 'weblog',
-                eventName: 'TDExtRecurringEvent',
-                eventFrequency: 250,
-                targetWindow: 'self',
-                tdNs: 'td',
-                options: {
-                    unload: {
-                        enable: true
-                    },
-                    clicks: {
-                        enable: true,
-                        targetAttr: 'data-trackable'
-                    },
-                    scroll: {
-                        enable: true,
-                        threshold: 2,
-                        granularity: 20,
-                        unit: 'percent'
-                    },
-                    read: {
-                        enable: true,
-                        threshold: 2,
-                        granularity: 20,
-                        target: window.document.getElementById('article')
-                    },
-                    media: {
-                        enable: true,
-                        heartbeat: 5
-                    },
-                    form: {
-                        enable: true,
-                        targets: [].slice.call(window.document.getElementsByTagName('form'))
-                    }
+        // Init TD Extension
+        tdext.init({
+            table: 'weblog',
+            eventName: 'TDExtRecurringEvent',
+            eventFrequency: 250,
+            targetWindow: 'self',
+            tdNs: 'td',
+            options: {
+                unload: {
+                    enable: true
+                },
+                clicks: {
+                    enable: true,
+                    targetAttr: 'data-trackable'
+                },
+                scroll: {
+                    enable: true,
+                    threshold: 2,
+                    granularity: 20,
+                    unit: 'percent'
+                },
+                read: {
+                    enable: true,
+                    threshold: 2,
+                    granularity: 20,
+                    target: window.document.getElementById('article')
+                },
+                media: {
+                    enable: true,
+                    heartbeat: 5
+                },
+                form: {
+                    enable: true,
+                    targets: [].slice.call(window.document.getElementsByTagName('form'))
                 }
-            });
-
-            // Track PV
-            tdext.trackPageview();
+            }
         });
+
+        // Set a Root ID for events dispatched by other than Extension
+        td.set('$global', 'root_id', tdext.rootId);
+
+        // Track PV
+        tdext.trackPageview();
     }
 }());

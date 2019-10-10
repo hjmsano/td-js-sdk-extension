@@ -1,6 +1,6 @@
 {
   "name": "td-js-sdk-extension",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Extension Pack for TD-JS-SDK",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -20,9 +20,9 @@
   "homepage": "https://github.com/hjmsano/td-js-sdk-extension#readme",
   "dependencies": {},
   "devDependencies": {
-    "@babel/core": "^7.6.2",
+    "@babel/core": "^7.6.3",
     "@babel/plugin-proposal-decorators": "^7.6.0",
-    "@babel/preset-env": "^7.6.2",
+    "@babel/preset-env": "^7.6.3",
     "babel-eslint": "^10.0.3",
     "babel-loader": "^8.0.6",
     "eslint": "^5.16.0",
