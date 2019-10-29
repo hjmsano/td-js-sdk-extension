@@ -381,4 +381,4 @@ GROUP BY
 ```
 
 ## ライセンスと著作権
-この拡張は [Ingestly Tracking JavaScript](https://github.com/ingestly/ingestly-client-javascripthttps://github.com/ingestly/ingestly-client-javascript) からフォークしました。
+この拡張は [Ingestly Tracking JavaScript](https://github.com/ingestly/ingestly-client-javascript) からフォークしました。
