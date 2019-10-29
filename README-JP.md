@@ -1,13 +1,13 @@
 # Extension for Treasure Data's TD-JS-SDK
 
-[Japanese document available here / 日本語のドキュメントはこちら](README-JP.md)
+[English document available here / 英語のドキュメントはこちら](README.md)
 
-## Installation
+## 導入
 
-First of all, see `/example/index.html`. It helps you to understand the installation.
+まず先に、 `/example/index.html` を見てください。導入方法について理解するのに役立ちます。
 
-1. Embed TD-JS-SDK loader in your html file. This is the same process as [official TD-JS-SDK implementation](https://github.com/treasure-data/td-js-sdk#installing).
-**DO NOT follow other than this first step. YOU DO NOT need `new Treasure()` and other codes because everything is in `config.js`.**
+1. TD-JS-SDKローダーをhtmlに埋め込みます。これは [公式の TD-JS-SDK 実装](https://github.com/treasure-data/td-js-sdk#installing) と同じ手順です。
+**この最初のステップ以外の手順は行わないでください。 `new Treasure()` や他のコードは必要ありません。全て `config.js` に内用されています。**
 
 ```html
 <!-- Treasure Data -->
@@ -16,31 +16,31 @@ First of all, see `/example/index.html`. It helps you to understand the installa
 </script>
 ```
 
-2. Embed two files in `/dist` directory. One is a core file of this extension, another one is configuration and initialization file.
-  - `td-js-sdk-ext.js` is a core library of the extension
-  - `config.js` contains everything you need for measurement
+2. `/dist` ディレクトリ内の2つのファイルを埋め込んでください。1つはこの拡張のコアファイル、もう一つは設定と初期化のファイルです。
+  - `td-js-sdk-ext.js` はこの拡張のコアライブラリです
+  - `config.js` は計測に必要な全てを内包しています
 
 ```html
 <script src="td-js-sdk-ext.js"></script>
 <script src="config.js"></script>
 ```
 
-3. Modify `config.js` by following the below Configuration section.
+3. `config.js` を以下の「構成」セクションの手順に従って変更します。
 
 
-## Configuration
+## 構成
 
-### TreasureData Standard Configuration Variables
+### TreasureData 標準の設定変数
 
-In the top of `config.js`, you can see lines for TD-JS-SDK initialization like `var td = new Treasure({...});`.
-This is a standard configuration process for TD-JS-SDK so set each variables by referring the [official reference in TD-JS-SDK Readme](https://github.com/treasure-data/td-js-sdk#treasureconfig).
+`config.js` の冒頭に、 TD-JS-SDKを初期化するための `var td = new Treasure({...});` のような行があります。
+これはTD-JS-SDKの標準的な設定プロセスなので、 [TD-JS-SDK Readme 中の公式リファレンス](https://github.com/treasure-data/td-js-sdk#treasureconfig) を参照しながら各変数をセットしてください。
 
-### Extension Specific Configuration Variables
+### Extension 固有の設定変数
 
-A few lines after `new Treasure({...})`, there is another initialization method call like `tdext.init({...})`.
-You can control what to be measured and granularity of events.
+`new Treasure({...})` の数行後に、`tdext.init({...})` のようなもう一つの初期化メソッド呼び出しがあります。
+何を計測するか、イベントの粒度をどうするかを制御可能です。
 
-|variable|example|description|
+|変数|例|説明|
 |:---|:---|:---|
 |`table`|`weblog`|A table name for storing all data measured by the extension|
 |`eventName`|`TDExtRecurringEvent`|The extension dispatches a recurring event to observe element visibility. Change an event name if needed.|
@@ -48,68 +48,68 @@ You can control what to be measured and granularity of events.
 |`targetWindow`|`self`|A frame to be observed but basically this should be `self` because TD-JS-SDK does not work in iframe properly.|
 |`tdNs`|`td`|A namespace of TD-JS-SDK object.|
 
-#### Time-spent on a page (unload)
+#### ページ上での滞在時間（unload）
 
 - Unload tracking set an eventListener to one of available events when the page is being unloaded.
 - You can get an exact time that user spent during the specific pageview.
 - In `tdext.init()`, set `true` for `options.unload.enable`.
 
-#### Clicks with data-trackable
+#### data-trackable を用いたクリック計測
 
 - Click tracking is triggered if the clicked element (or its parent) has the specified `data-*` attribution.
 - In `tdext.init()`, set `true` for `options.clicks.enable` and adjust values:
 
-|variable|example|description|
+|変数|例|説明|
 |:---|:---|:---|
 |`targetAttr`|`data-trackable`|attribution name for identifying the target element|
 
 - If you set `data-trackable` for `targetAttr`, you need to add `data-trackable` attribution to every element you want to track clicks.
 - Ideally, every block elements should be structured like hierarchy. and each block element should have `data-trackable` with meaningful value.
 
-#### Scroll Depth
+#### スクロール深度
 
 - Scroll depth tracking for both fixed page and infinity scroll (lazy-load) page.
 - In `tdext.init()`, set `true` for `options.scroll.enable` and adjust values:
 
-|variable|example|description|
+|変数|例|説明|
 |:---|:---|:---|
 |`threshold`|`2`|track the depth when the user stay at/over X percent/pixels for more than T seconds specified here|
 |`granularity`|`20`|track the depth every X percent/pixels increased|
 |`unit`|`percent`|for the fixed height page, you can use `percent`. If the page is infinity scroll, use `pixels` instead|
 
-#### Read-Through Rate
+#### 読了率
 
 - Read-Through Rate means is a metrics that describes how much range of content is consumed by an user.
 - In `tdext.init()`, set `true` for `options.read.enable` and adjust values:
 
-|variable|example|description|
+|変数|例|説明|
 |:---|:---|:---|
 |`threshold`|`4`|track the depth of content when the user stay at/over X percent|
 |`granularity`|`10`|track the rate every X percent increased|
 |`targets`|`document.getElementById('article')`|An element which contains article body (content). Specify a block elements to be observed as a target of read-through.|
 
-#### Media Tracking
+#### メディア計測
 
 - Once you enabled this option, all media which is VIDEO or AUDIO will be tracked automatically.
 - This option supports `play`, `pause` and `eneded` events plus the heart-beat.
 - In `tdext.init()`, set `true` for `options.media.enable` and adjust values:
 
-|variable|example|description|
+|変数|例|説明|
 |:---|:---|:---|
 |`heartbeat`|`5`|the heart-beat tracker will be dispatched every X sec defined here|
 
-#### Form Analysis
+#### フォーム分席
 
 - Form Analysis provides a statistics info regarding the form completion but not values of form fields.
 - This feature accepts multiple forms by passing a list of target element of forms.
 - In `tdext.init()`, set `true` for `options.form.enable` and adjust values:
 
-|variable|example|description|
+|変数|例|説明|
 |:---|:---|:---|
 |`targets`|`document.getElementsByTagName('form')`|A list of form elements.|
 
 
-## Methods
+## メソッド
 
 ### tdext.trackPageview()
 
@@ -136,9 +136,9 @@ You can control what to be measured and granularity of events.
 |`target`|`document.getElementById('article')`|A block element which contains an article body (content).|
 
 
-## Action and Category combination
+## Action と Category の組み合わせ
 
-|Action|Category|Description|
+|Action|Category|説明|
 |:----|:----|:----|
 |`view`|`page`|Pageview Event. One record per a pageview.|
 |`rum`|`page`|A record for logging the performance information for Real User Monitoring. One record per a pageview.|
@@ -155,9 +155,9 @@ You can control what to be measured and granularity of events.
 |`answer`|`survey`|If you are using [TD-Survey](https://github.com/hjmsano/td-survey), the survey result will be recorded with these action/category pair.|
 
 
-## Querying data measured by the Extension
+## 拡張によって計測されたデータに対するクエリー
 
-### Daily Pageviews & Unique Browsers
+### 日別ページビュー数とユニークブラウザ数
 
 ```sql
 SELECT
@@ -167,11 +167,11 @@ SELECT
   COUNT(*) AS pageviews,
   COUNT(DISTINCT td_client_id) AS unique_browsers
 FROM
-  your_database.weblog  -- CHANGE HERE
+  your_database.weblog  -- 変更してください
 WHERE
   TD_TIME_RANGE(time,
     DATE_FORMAT(DATE_ADD('hour',
-      9 - (24 * 30),  -- Last 30 days in JST
+      9 - (24 * 30),  -- 日本時間で過去30日
       NOW()),
       '%Y-%m-%d %H:%i:%s'),
     NULL,
@@ -183,7 +183,7 @@ GROUP BY
 ;
 ```
 
-### Scroll Depth on front page
+### トップページのスクロール深度
 
 ```sql
 SELECT
@@ -202,11 +202,11 @@ FROM (
       root_id,
       MAX(scroll_depth) AS scroll_depth
     FROM
-      your_database.weblog  -- CHANGE HERE
+      your_database.weblog  -- 変更してください
     WHERE
       TD_TIME_RANGE(time,
         DATE_FORMAT(DATE_ADD('hour',
-          9-24,  -- Last 24 hours in JST
+          9-24,  -- 日本時間で過去24時間
           NOW()),
           '%Y-%m-%d %H:%i:%s'),
         NULL,
@@ -220,7 +220,7 @@ FROM (
 ;
 ```
 
-### Read-Through Rate per an article (Read Complete is > 10sec && 80%)
+### 記事別読了率 （読了は 10秒以上かつ80%以上）
 
 ```sql
 SELECT
@@ -234,11 +234,11 @@ FROM (
       action,
       MAX(read_rate) AS read_depth
     FROM
-      your_database.weblog -- CHANGE HERE
+      your_database.weblog -- 変更してください
     WHERE
       TD_TIME_RANGE(time,
         DATE_FORMAT(DATE_ADD('hour',
-          9-24, -- Last 24 hours in JST
+          9-24, -- 日本時間で過去24時間
           NOW()),
           '%Y-%m-%d %H:%i:%s'),
         NULL,
@@ -265,7 +265,7 @@ GROUP BY
 ;
 ```
 
-### Media (Video & Audio) playback analysis per a media file
+### メディアファイル別メディア (ビデオ & オーディオ) 再生分析
 
 ```sql
 SELECT
@@ -286,11 +286,11 @@ FROM (
       root_id,
       MAX(media_played_percent) AS played_percent
     FROM
-      your_database.weblog -- CHANGE HERE
+      your_database.weblog -- 変更してください
     WHERE
       TD_TIME_RANGE(time,
         DATE_FORMAT(DATE_ADD('hour',
-            9-24, -- Last 24 hours in JST
+            9-24, -- 日本時間で過去24時間
             NOW()),
           '%Y-%m-%d %H:%i:%s'),
         NULL,
@@ -311,7 +311,7 @@ GROUP BY
 ;
 ```
 
-### Median time-spent per a page
+### ページごとの滞在時間の中央値
 
 ```sql
 SELECT
@@ -326,11 +326,11 @@ FROM (
       td_path,
       MAX(since_init_ms) AS elapsed_ms
     FROM
-      your_database.weblog -- CHANGE HERE
+      your_database.weblog -- 変更してください
     WHERE
       TD_TIME_RANGE(time,
         DATE_FORMAT(DATE_ADD('hour',
-            9-24, -- Last 24 hours in JST
+            9-24, -- 日本時間で過去24時間
             NOW()),
           '%Y-%m-%d %H:%i:%s'),
         NULL,
@@ -346,7 +346,7 @@ GROUP BY
 ;
 ```
 
-### Hourly RUM for front page
+### トップページにおける時間別RUM
 
 ```sql
 SELECT
@@ -363,11 +363,11 @@ SELECT
   ELSE 'unknown' END as dom_content_loaded,
   COUNT(*) AS pageviews
 FROM
-  your_database.weblog  -- CHANGE HERE
+  your_database.weblog  -- 変更してください
 WHERE
   TD_TIME_RANGE(time,
     DATE_FORMAT(DATE_ADD('hour',
-      9 - (24 * 7), -- Last 7 days in JST
+      9 - (24 * 7), -- 日本時間で過去7日
       NOW()),
       '%Y-%m-%d %H:%i:%s'),
     NULL,
@@ -380,5 +380,5 @@ GROUP BY
 ;
 ```
 
-## License and Copyright
-This extension is forked from [Ingestly Tracking JavaScript](https://github.com/ingestly/ingestly-client-javascripthttps://github.com/ingestly/ingestly-client-javascript).
+## ライセンスと著作権
+この拡張は [Ingestly Tracking JavaScript](https://github.com/ingestly/ingestly-client-javascripthttps://github.com/ingestly/ingestly-client-javascript) からフォークしました。
