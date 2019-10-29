@@ -4,15 +4,18 @@
 
 First of all, see `/example/index.html`. It helps you to understand the installation.
 
-1. Embed TD-JS-SDK loader in your html file. This is the same process as official TD-JS-SDK implementation.
+1. Embed TD-JS-SDK loader in your html file. This is the same process as [official TD-JS-SDK implementation](https://github.com/treasure-data/td-js-sdk#installing). **DO NOT follow other than this first step. YOU DO NOT need `new Treasure()` and other codes because everything is in `config.js`.**
 
 ```html
 <!-- Treasure Data -->
 <script type="text/javascript">
-!function(t,e){if(void 0===e[t]){e[t]=function(){e[t].clients.push(this),this._init=[Array.prototype.slice.call(arguments)]},e[t].clients=[];for(var r=function(t){return function(){return this["_"+t]=this["_"+t]||[],this["_"+t].push(Array.prototype.slice.call(arguments)),this}},s=["blockEvents","unblockEvents","setSignedMode","setAnonymousMode","resetUUID","addRecord","fetchGlobalID","set","trackEvent","trackPageview","trackClicks","ready"],n=0;n<s.length;n++){var c=s[n];e[t].prototype[c]=r(c)}var o=document.createElement("script");o.type="text/javascript",o.async=!0,o.src=("https:"===document.location.protocol?"https:":"http:")+"//cdn.treasuredata.com/sdk/2.1/td.min.js";var a=document.getElementsByTagName("script")[0];a.parentNode.insertBefore(o,a)}}("Treasure",this);</script>
+!function(t,e){if(void 0===e[t]){e[t]=function(){e[t].clients.push(this),this._init=[Array.prototype.slice.call(arguments)]},e[t].clients=[];for(var r=function(t){return function(){return this["_"+t]=this["_"+t]||[],this["_"+t].push(Array.prototype.slice.call(arguments)),this}},s=["blockEvents","setSignedMode","fetchServerCookie","unblockEvents","setSignedMode","setAnonymousMode","resetUUID","addRecord","fetchGlobalID","set","trackEvent","trackPageview","trackClicks","ready"],n=0;n<s.length;n++){var o=s[n];e[t].prototype[o]=r(o)}var c=document.createElement("script");c.type="text/javascript",c.async=!0,c.src=("https:"===document.location.protocol?"https:":"http:")+"//cdn.treasuredata.com/sdk/2.2/td.min.js";var i=document.getElementsByTagName("script")[0];i.parentNode.insertBefore(c,i)}}("Treasure",this);
+</script>
 ```
 
 2. Embed two files in `/dist` directory. One is a core file of this extension, another one is configuration and initialization file.
+  - `td-js-sdk-ext.js` is a core library of the extension
+  - `config.js` contains everything you need for measurement
 
 ```html
 <script src="td-js-sdk-ext.js"></script>
@@ -23,6 +26,18 @@ First of all, see `/example/index.html`. It helps you to understand the installa
 
 
 ## Configuration
+
+### TreasureData Standard Configuration Variables
+
+In the top of `config.js`, you can see lines for TD-JS-SDK initialization like `var td = new Treasure({...});`.
+This is a standard configuration process for TD-JS-SDK so set each variables by referring the [official reference in TD-JS-SDK Readme](https://github.com/treasure-data/td-js-sdk#treasureconfig).
+
+
+### Extension Specific Configuration Variables
+
+A few lines after `new Treasure({...})`, there is another initialization method call like `tdext.init({...})`.
+
+
 
 
 

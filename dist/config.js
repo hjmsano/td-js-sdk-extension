@@ -3,8 +3,13 @@ var td = new Treasure({
     database: 'your_db_name',
     writeKey: 'your_api_write_key',
     host: 'in.treasuredata.com',
+    sscDomain: 'your.domain',
+    sscServer: 'ssc.your.domain',
+    useServerSideCookie: false,
     startInSignedMode: true
 });
+
+td.set('$global', 'td_global_id', 'td_global_id');
 
 // Track everything by TD JS SDK Extension
 (function () {
@@ -50,9 +55,6 @@ var td = new Treasure({
                 }
             }
         });
-
-        // Set a Root ID for events dispatched by other than Extension
-        td.set('$global', 'root_id', tdext.rootId);
 
         // Track PV
         tdext.trackPageview();
