@@ -42,98 +42,98 @@
 
 |変数|例|説明|
 |:---|:---|:---|
-|`table`|`weblog`|A table name for storing all data measured by the extension|
-|`eventName`|`TDExtRecurringEvent`|The extension dispatches a recurring event to observe element visibility. Change an event name if needed.|
-|`eventFrequency`|`250`|A throttling interval for the recurring event. This is linked to the data accuracy and the user experience.|
-|`targetWindow`|`self`|A frame to be observed but basically this should be `self` because TD-JS-SDK does not work in iframe properly.|
-|`tdNs`|`td`|A namespace of TD-JS-SDK object.|
+|`table`|`weblog`|拡張によって計測された全てのデータを格納するテーブル名|
+|`eventName`|`TDExtRecurringEvent`|拡張は可視性の監視のために再帰イベントを発火します。 必要があればイベント名を変更します|
+|`eventFrequency`|`250`|再帰イベントを間引く間隔です。これは計測精度とユーザー体験に直結しています|
+|`targetWindow`|`self`|観測対象のフレームを指定しますが、TD-JS-SDKがiframe内での動作に適さないため、基本的に `self` であるべきです|
+|`tdNs`|`td`|TD-JS-SDK のオブジェクトの名前空間|
 
-#### ページ上での滞在時間（unload）
+### ページ上での滞在時間 (アンロード)
 
-- Unload tracking set an eventListener to one of available events when the page is being unloaded.
-- You can get an exact time that user spent during the specific pageview.
-- In `tdext.init()`, set `true` for `options.unload.enable`.
+- アンロード計測はページがアンロードされる際に利用可能なイベントの一つにイベントリスナーをセットします
+- ユーザーが特定のページビューの間に割いた正確な時間が得られます
+- `tdext.init()` の中で、 `options.unlaod.enable` に対して `true` を設定します
 
-#### data-trackable を用いたクリック計測
+### data-trackable によるクリック計測
 
-- Click tracking is triggered if the clicked element (or its parent) has the specified `data-*` attribution.
-- In `tdext.init()`, set `true` for `options.clicks.enable` and adjust values:
-
-|変数|例|説明|
-|:---|:---|:---|
-|`targetAttr`|`data-trackable`|attribution name for identifying the target element|
-
-- If you set `data-trackable` for `targetAttr`, you need to add `data-trackable` attribution to every element you want to track clicks.
-- Ideally, every block elements should be structured like hierarchy. and each block element should have `data-trackable` with meaningful value.
-
-#### スクロール深度
-
-- Scroll depth tracking for both fixed page and infinity scroll (lazy-load) page.
-- In `tdext.init()`, set `true` for `options.scroll.enable` and adjust values:
+- クリック計測はクリックされた要素（またはその親要素）が、指定した `data-*` 属性を持っている場合に発動します
+- `tdext.init()` の中で、 `options.clicks.enable` に対して `true` を設定し、設定値を調整します：
 
 |変数|例|説明|
 |:---|:---|:---|
-|`threshold`|`2`|track the depth when the user stay at/over X percent/pixels for more than T seconds specified here|
-|`granularity`|`20`|track the depth every X percent/pixels increased|
-|`unit`|`percent`|for the fixed height page, you can use `percent`. If the page is infinity scroll, use `pixels` instead|
+|`targetAttr`|`data-trackable`|対象となる要素を特定するための属性名|
 
-#### 読了率
+- もし `targetAttr` に `data-trackable` がセットされている場合、計測したい全ての要素に `data-trackable` 属性を追加する必要があります
+- 理想的には、全てのブロック要素が階層のように構造化されていて、それぞれのブロック要素が `data-trackable` に意味のある値を持っているべきです
 
-- Read-Through Rate means is a metrics that describes how much range of content is consumed by an user.
-- In `tdext.init()`, set `true` for `options.read.enable` and adjust values:
+### スクロール深度
 
-|変数|例|説明|
-|:---|:---|:---|
-|`threshold`|`4`|track the depth of content when the user stay at/over X percent|
-|`granularity`|`10`|track the rate every X percent increased|
-|`targets`|`document.getElementById('article')`|An element which contains article body (content). Specify a block elements to be observed as a target of read-through.|
-
-#### メディア計測
-
-- Once you enabled this option, all media which is VIDEO or AUDIO will be tracked automatically.
-- This option supports `play`, `pause` and `eneded` events plus the heart-beat.
-- In `tdext.init()`, set `true` for `options.media.enable` and adjust values:
+- 高さ固定のページと無限スクロール（遅延読み込み）に対応するスクロール深度計測
+- `tdext.init()` の中で、 `options.scroll.enable` に対して `true` を設定し、設定値を調整します：
 
 |変数|例|説明|
 |:---|:---|:---|
-|`heartbeat`|`5`|the heart-beat tracker will be dispatched every X sec defined here|
+|`threshold`|`2`|ユーザーが Xパーセント/ピクセル 地点で、ここで指定した T秒以上とどまった場合、スクロール深度が計測されます|
+|`granularity`|`20`|ここで指定した Xパーセント/ピクセル 深度が増加するごとに計測されます|
+|`unit`|`percent`|高さ固定のページの場合、`percent` が使えます。ページが無限スクロールの場合、代わりに `pixels` を指定します|
 
-#### フォーム分席
+### 読了率
 
-- Form Analysis provides a statistics info regarding the form completion but not values of form fields.
-- This feature accepts multiple forms by passing a list of target element of forms.
-- In `tdext.init()`, set `true` for `options.form.enable` and adjust values:
+- 読了率はユーザーによってコンテンツのどれくらいの範囲が消費されたかを表す指標です
+- `tdext.init()` の中で、 `options.read.enable` に対して `true` を設定し、設定値を調整します：
 
 |変数|例|説明|
 |:---|:---|:---|
-|`targets`|`document.getElementsByTagName('form')`|A list of form elements.|
+|`threshold`|`4`|ユーザーが読了率X以上を、何秒以上維持したら計測するかの閾値です|
+|`granularity`|`10`|ここで指定した割合で読了率が変化する度に計測されます|
+|`target`|`document.getElementsById('article')`|記事本文（コンテンツ）を持つエレメント。読了計測の観測対象となるブロック要素を指定します|
+
+### メディア計測
+
+- このオプションを有効にすると、VIDEOまたはAUDIOの全てのメディアが自動計測されます
+- このオプションは、 `play`, `pause` そして `eneded` イベントに加え、ハードビートをサポートします
+- `tdext.init()` の中で、 `options.media.enable` に対して `true` を設定し、設定値を調整します：
+
+|変数|例|説明|
+|:---|:---|:---|
+|`heartbeat`|`5`|ここで指定した X秒 ごとにハートビート計測が発動します|
+
+### フォーム分析
+
+- Form Analysisはフォームの完了についての統計情報を提供します。フォームのフィールドに入力された値は含みません
+- この機能は、フォームo要素のリストを渡すことで、複数のフォームに対応します
+- `tdext.init()` の中で、 `options.form.enable` に対して `true` を設定し、設定値を調整します：
+
+|変数|例|説明|
+|:---|:---|:---|
+|`targets`|`document.getElementsByTagName('form')`|フォーム要素のリストを渡します|
 
 
 ## メソッド
 
 ### tdext.trackPageview()
 
-- Track a pageview event
-- No parameter
+- ページビューイベントを計測
+- 引数はありません
 
 ### tdext.trackAction(action, category, context)
 
-- Track a custom event
+- カスタムイベントを計測
 
-|parameter|example|description|
+|引数|例|説明|
 |:---|:---|:---|
-|`action`|`toggle`|An action name.|
-|`category`|`switch`|A target being applied the action.|
-|`context`|`{name: "hoge"}`|An object of custom context for the event.|
+|`action`|`toggle`|アクション名|
+|`category`|`switch`|アクションの対象|
+|`context`|`{name: "hoge"}`|イベントに対する任意のコンテキストのオブジェクト|
 
 ### tdext.trackRead(target)
 
-- Initialize the Read-Through tracking
-- If your page uses the lazy-load (infinity scroll and append another content ondemandly), you should re-initialize by `trackRead()` to measure the newly added article.
+- 読了計測を初期化します
+- もしページが遅延読込を使っている（無限スクロールで必要に応じてコンテンツを追記している）場合、新たに追加された記事を計測するため `trackRead()` によって再初期化すべきです。
 
-|parameter|example|description|
+|引数|例|説明|
 |:---|:---|:---|
-|`target`|`document.getElementById('article')`|A block element which contains an article body (content).|
+|`target`|`document.getElementById('article')`|記事本文（コンテンツ）を含むブロック要素|
 
 
 ## Action と Category の組み合わせ

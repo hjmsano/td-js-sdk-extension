@@ -86,7 +86,7 @@ You can control what to be measured and granularity of events.
 |:---|:---|:---|
 |`threshold`|`4`|track the depth of content when the user stay at/over X percent|
 |`granularity`|`10`|track the rate every X percent increased|
-|`targets`|`document.getElementById('article')`|An element which contains article body (content). Specify a block elements to be observed as a target of read-through.|
+|`target`|`document.getElementById('article')`|An element which contains article body (content). Specify a block elements to be observed as a target of read-through.|
 
 #### Media Tracking
 
