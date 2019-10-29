@@ -381,4 +381,4 @@ GROUP BY
 ```
 
 ## License and Copyright
-This extension is forked from [Ingestly Tracking JavaScript](https://github.com/ingestly/ingestly-client-javascripthttps://github.com/ingestly/ingestly-client-javascript).
+This extension is forked from [Ingestly Tracking JavaScript](https://github.com/ingestly/ingestly-client-javascript).
