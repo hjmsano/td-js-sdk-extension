@@ -157,16 +157,67 @@ You can control what to be measured and granularity of events.
 ### Daily Pageviews & Unique Browsers
 
 ```sql
-
+SELECT
+  TD_TIME_FORMAT(time,
+    'yyyy-MM-dd',
+    'JST') AS date_time,
+  COUNT(*) AS pageviews,
+  COUNT(DISTINCT td_client_id) AS unique_browsers
+FROM
+  your_database.weblog  -- CHANGE HERE
+WHERE
+  TD_TIME_RANGE(time,
+    DATE_FORMAT(DATE_ADD('hour',
+      9 - (24 * 30),  -- Last 30 days in JST
+      NOW()),
+      '%Y-%m-%d %H:%i:%s'),
+    NULL,
+    'JST')
+  AND action = 'view'
+  AND category = 'page'
+GROUP BY
+  1
+;
 ```
 
 ### Scroll Depth on front page
 
 ```sql
-
+SELECT
+  SUM(CASE
+      WHEN (scroll_depth >= 20) THEN 1 ELSE 0 END) AS "20p",
+  SUM(CASE
+      WHEN (scroll_depth >= 40) THEN 1 ELSE 0 END) AS "40p",
+  SUM(CASE
+      WHEN (scroll_depth >= 60) THEN 1 ELSE 0 END) AS "60p",
+  SUM(CASE
+      WHEN (scroll_depth >= 80) THEN 1 ELSE 0 END) AS "80p",
+  SUM(CASE
+      WHEN (scroll_depth >= 100) THEN 1 ELSE 0 END) AS "100p"
+FROM (
+    SELECT
+      root_id,
+      MAX(scroll_depth) AS scroll_depth
+    FROM
+      your_database.weblog  -- CHANGE HERE
+    WHERE
+      TD_TIME_RANGE(time,
+        DATE_FORMAT(DATE_ADD('hour',
+          9-24,  -- Last 24 hours in JST
+          NOW()),
+          '%Y-%m-%d %H:%i:%s'),
+        NULL,
+        'JST')
+      AND action = 'scroll'
+      AND category = 'page'
+      AND td_path = '/'
+    GROUP BY
+      root_id
+  )
+;
 ```
 
-### Read-Through Rate per article
+### Read-Through Rate per an article
 
 ```sql
 SELECT
@@ -194,19 +245,19 @@ FROM (
     WHERE
       TD_TIME_RANGE(time,
         DATE_FORMAT(DATE_ADD('hour',
-            9-24, -- Last 24 hours in JST
-            NOW()),
+          9-24, -- Last 24 hours in JST
+          NOW()),
           '%Y-%m-%d %H:%i:%s'),
         NULL,
         'JST')
       AND(
         (
-          ACTION = 'read'
+          action = 'read'
           AND category = 'content'
           AND read_elapsed_ms >= 2000
         )
         OR (
-          ACTION = 'view'
+          action = 'view'
           AND category = 'page'
         )
       )
@@ -219,7 +270,7 @@ GROUP BY
 ;
 ```
 
-### Media (Video & Audio) playback
+### Media (Video & Audio) playback analysis per a media file
 
 ```sql
 SELECT
@@ -249,7 +300,7 @@ FROM (
           '%Y-%m-%d %H:%i:%s'),
         NULL,
         'JST')
-      AND ACTION IN(
+      AND action IN(
         'timeupdate',
         'ended'
       )
@@ -265,19 +316,74 @@ GROUP BY
 ;
 ```
 
+### Median time-spent per a page
 
-### Time-Spent on a page
-
+```sql
+SELECT
+  td_path,
+  APPROX_PERCENTILE(
+    elapsed_ms,
+    0.5
+  ) / 1000 AS median_time_spent_sec
+FROM (
+    SELECT
+      root_id,
+      td_path,
+      MAX(since_init_ms) AS elapsed_ms
+    FROM
+      your_database.weblog -- CHANGE HERE
+    WHERE
+      TD_TIME_RANGE(time,
+        DATE_FORMAT(DATE_ADD('hour',
+            9-24, -- Last 24 hours in JST
+            NOW()),
+          '%Y-%m-%d %H:%i:%s'),
+        NULL,
+        'JST')
+      AND action = 'scroll'
+      AND category = 'page'
+    GROUP BY
+      root_id,
+      td_path
+  )
+GROUP BY
+  td_path
+;
 ```
 
+### Hourly RUM for front page
+
+```sql
+SELECT
+  TD_TIME_FORMAT(time,
+    'yyyy-MM-dd HH:00:00',
+    'JST') AS date_time,
+  CASE
+  WHEN performance_dcl < 1000 THEN 'less_than_1sec'
+  WHEN (performance_dcl >= 1000 AND performance_dcl < 2000) THEN '1-2sec'
+  WHEN (performance_dcl >= 2000 AND performance_dcl < 4000) THEN '2-4sec'
+  WHEN (performance_dcl >= 4000 AND performance_dcl < 7000) THEN '4-7sec'
+  WHEN (performance_dcl >= 7000 AND performance_dcl < 10000) THEN '7-10sec'
+  WHEN performance_dcl > 10000 THEN 'more_than_10sec'
+  ELSE 'unknown' END as dom_content_loaded,
+  COUNT(*) AS pageviews
+FROM
+  your_database.weblog  -- CHANGE HERE
+WHERE
+  TD_TIME_RANGE(time,
+    DATE_FORMAT(DATE_ADD('hour',
+      9 - (24 * 7), -- Last 7 days in JST
+      NOW()),
+      '%Y-%m-%d %H:%i:%s'),
+    NULL,
+    'JST')
+  AND action = 'rum'
+  AND category = 'page'
+  AND td_path = '/'
+GROUP BY
+  1,2
+;
 ```
-
-### Hourly RUM
-
-```
-
-```
-
 
 ## License and Copyright
 This extension is forked from [Ingestly Tracking JavaScript](https://github.com/ingestly/ingestly-client-javascripthttps://github.com/ingestly/ingestly-client-javascript).
