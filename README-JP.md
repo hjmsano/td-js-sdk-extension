@@ -111,20 +111,27 @@
 
 ## メソッド
 
-### tdext.trackPageview()
+### tdext.trackPageview(context, callback)
 
 - ページビューイベントを計測
-- 引数はありません
+- いずれの引数も任意です
 
-### tdext.trackAction(action, category, context)
+|引数|例|説明|
+|:---|:---|:---|
+|`context`|`{name: "hoge"}`|イベントに対する任意のコンテキストのオブジェクト|
+|`callback`|`function(){}`|計測直後に実行させたい処理の関数名、または関数|
+
+### tdext.trackAction(action, category, context, callback)
 
 - カスタムイベントを計測
+- いずれの引数も任意ですが、 `action` と `category` は指定することを強く推奨します
 
 |引数|例|説明|
 |:---|:---|:---|
 |`action`|`toggle`|アクション名|
 |`category`|`switch`|アクションの対象|
 |`context`|`{name: "hoge"}`|イベントに対する任意のコンテキストのオブジェクト|
+|`callback`|`function(){}`|計測直後に実行させたい処理の関数名、または関数|
 
 ### tdext.trackRead(target)
 

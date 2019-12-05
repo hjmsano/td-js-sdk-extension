@@ -73,7 +73,7 @@ You can control what to be measured and granularity of events.
 
 |variable|example|description|
 |:---|:---|:---|
-|`threshold`|`2`|track the depth when the user stay at/over X percent/pixels for more than T seconds specified here|
+|`threshold`|`2`|track the depth when the user stay at/over N percent/pixels for more than X seconds specified here|
 |`granularity`|`20`|track the depth every X percent/pixels increased|
 |`unit`|`percent`|for the fixed height page, you can use `percent`. If the page is infinity scroll, use `pixels` instead|
 
@@ -84,7 +84,7 @@ You can control what to be measured and granularity of events.
 
 |variable|example|description|
 |:---|:---|:---|
-|`threshold`|`4`|track the depth of content when the user stay at/over X percent|
+|`threshold`|`4`|track the depth of content when the user keep staying at/over N percent for more than X seconds|
 |`granularity`|`10`|track the rate every X percent increased|
 |`target`|`document.getElementById('article')`|An element which contains article body (content). Specify a block elements to be observed as a target of read-through.|
 
@@ -111,20 +111,27 @@ You can control what to be measured and granularity of events.
 
 ## Methods
 
-### tdext.trackPageview()
+### tdext.trackPageview(context, callback)
 
 - Track a pageview event
-- No parameter
+- Any parameters are optional.
 
-### tdext.trackAction(action, category, context)
+|parameter|example|description|
+|:---|:---|:---|
+|`context`|`{name: "hoge"}`|An object of custom context for the event.|
+|`callback`|`function(){}`|A method name or a method to be triggered just after measurement|
+
+### tdext.trackAction(action, category, context, callback)
 
 - Track a custom event
+- Any parameters are optional but `action` and `category` are strongly recommended to be defined.
 
 |parameter|example|description|
 |:---|:---|:---|
 |`action`|`toggle`|An action name.|
 |`category`|`switch`|A target being applied the action.|
 |`context`|`{name: "hoge"}`|An object of custom context for the event.|
+|`callback`|`function(){}`|A method name or a method to be triggered just after measurement|
 
 ### tdext.trackRead(target)
 
