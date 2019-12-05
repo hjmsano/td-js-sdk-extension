@@ -2,7 +2,7 @@ import Events from './events';
 import Utils from './utils';
 
 const
-    extVersion = '0.1.3',
+    extVersion = '0.1.4',
     initTimestamp = +new Date();
 
 let config, targetWindow, tdNs, events, utils, unloadEvent,
@@ -76,7 +76,7 @@ export default class TDExt {
      * Send a payload to TD endpoint.
      *
      */
-    trackAction(action = 'unknown', category = 'unknown', context = {}) {
+    trackAction(action = 'unknown', category = 'unknown', context = {}, callback) {
         const
             now = new Date(),
             mandatory = {
@@ -94,10 +94,13 @@ export default class TDExt {
             ]);
         prevTimestamp = now;
         window[targetWindow][tdNs].trackEvent(config.table, payload);
+        if (typeof callback === 'function') {
+            callback();
+        }
     }
 
-    trackPageview() {
-        this.trackAction('view', 'page');
+    trackPageview(context = {}, callback) {
+        this.trackAction('view', 'page', context, callback);
     }
 
 
