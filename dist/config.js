@@ -58,5 +58,20 @@ td.set('$global', 'td_global_id', 'td_global_id');
 
         // Track PV
         tdext.trackPageview();
+
+        // Custom Action
+        tdext.trackAction(
+            'action',
+            'category',
+            {
+                custom_variable: 'something_value'
+            },
+            function () {
+                console.log("sending data to TD has been succeeded.");
+            },
+            function () {
+                console.log("failed to send data to TD.");
+            }
+        );
     }
 }());
