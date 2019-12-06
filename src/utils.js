@@ -32,11 +32,17 @@ export default class {
         let timing = window.performance.timing,
             interactive = timing.domInteractive - timing.domLoading,
             dcl = timing.domContentLoadedEventStart - timing.domLoading,
-            complete = timing.domComplete - timing.domLoading;
+            complete = timing.domComplete - timing.domLoading,
+            since_dns = (+new Date()) - timing.domainLookupStart,
+            since_req = (+new Date()) - timing.requestStart,
+            since_dl = (+new Date()) - timing.domLoading;
         return {
             performance_interactive: interactive >= 0 ? interactive : undefined,
             performance_dcl: dcl >= 0 ? dcl : undefined,
-            performance_complete: complete >= 0 ? complete : undefined
+            performance_complete: complete >= 0 ? complete : undefined,
+            performance_ts_dns: since_dns >= 0 ? since_dns : undefined,
+            performance_ts_req: since_req >= 0 ? since_req : undefined,
+            performance_ts_dl: since_dl >= 0 ? since_dl : undefined
         };
     }
 
