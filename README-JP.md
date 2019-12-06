@@ -111,7 +111,7 @@
 
 ## メソッド
 
-### tdext.trackPageview(context, callback)
+### tdext.trackPageview(context, successCallback, failureCallback)
 
 - ページビューイベントを計測
 - いずれの引数も任意です
@@ -119,9 +119,10 @@
 |引数|例|説明|
 |:---|:---|:---|
 |`context`|`{name: "hoge"}`|イベントに対する任意のコンテキストのオブジェクト|
-|`callback`|`function(){}`|計測直後に実行させたい処理の関数名、または関数|
+|`successCallback`|`function(){}`|データ送信に成功した直後に実行させたい処理の関数名、または関数|
+|`failureCallback`|`function(){}`|データ送信に失敗した直後に実行させたい処理の関数名、または関数|
 
-### tdext.trackAction(action, category, context, callback)
+### tdext.trackAction(action, category, context, successCallback, failureCallback)
 
 - カスタムイベントを計測
 - いずれの引数も任意ですが、 `action` と `category` は指定することを強く推奨します
@@ -131,7 +132,8 @@
 |`action`|`toggle`|アクション名|
 |`category`|`switch`|アクションの対象|
 |`context`|`{name: "hoge"}`|イベントに対する任意のコンテキストのオブジェクト|
-|`callback`|`function(){}`|計測直後に実行させたい処理の関数名、または関数|
+|`successCallback`|`function(){}`|データ送信に成功した直後に実行させたい処理の関数名、または関数|
+|`failureCallback`|`function(){}`|データ送信に失敗した直後に実行させたい処理の関数名、または関数|
 
 ### tdext.trackRead(target)
 

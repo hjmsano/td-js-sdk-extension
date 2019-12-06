@@ -111,7 +111,7 @@ You can control what to be measured and granularity of events.
 
 ## Methods
 
-### tdext.trackPageview(context, callback)
+### tdext.trackPageview(context, successCallback, failureCallback)
 
 - Track a pageview event
 - Any parameters are optional.
@@ -119,9 +119,10 @@ You can control what to be measured and granularity of events.
 |parameter|example|description|
 |:---|:---|:---|
 |`context`|`{name: "hoge"}`|An object of custom context for the event.|
-|`callback`|`function(){}`|A method name or a method to be triggered just after measurement|
+|`successCallback`|`function(){}`|A method name or a method to be triggered just after sending data is succeeded|
+|`failureCallback`|`function(){}`|A method name or a method to be triggered just after sending data is failed|
 
-### tdext.trackAction(action, category, context, callback)
+### tdext.trackAction(action, category, context, successCallback, failureCallback)
 
 - Track a custom event
 - Any parameters are optional but `action` and `category` are strongly recommended to be defined.
@@ -131,7 +132,8 @@ You can control what to be measured and granularity of events.
 |`action`|`toggle`|An action name.|
 |`category`|`switch`|A target being applied the action.|
 |`context`|`{name: "hoge"}`|An object of custom context for the event.|
-|`callback`|`function(){}`|A method name or a method to be triggered just after measurement|
+|`successCallback`|`function(){}`|A method name or a method to be triggered just after sending data is succeeded|
+|`failureCallback`|`function(){}`|A method name or a method to be triggered just after sending data is failed|
 
 ### tdext.trackRead(target)
 
