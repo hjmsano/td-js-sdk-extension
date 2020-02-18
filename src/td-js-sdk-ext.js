@@ -2,7 +2,7 @@ import Events from './events';
 import Utils from './utils';
 
 const
-    extVersion = '0.1.5',
+    extVersion = '0.1.6',
     initTimestamp = +new Date();
 
 let config, targetWindow, tdNs, events, utils, unloadEvent,
@@ -78,7 +78,7 @@ export default class TDExt {
      */
     trackAction(action = 'unknown', category = 'unknown', context = {}, successCallback, failureCallback) {
         const
-            now = new Date(),
+            now = +new Date(),
             mandatory = {
                 action: action,
                 category: category,
