@@ -2,6 +2,8 @@
 
 [English document available here / 英語のドキュメントはこちら](README.md)
 
+** 注意： このライブラリは Treasure Data 社の製品ではないことをご留意ください。自己責任でご利用ください。 **
+
 ## 導入
 
 まず先に、 `/example/index.html` を見てください。導入方法について理解するのに役立ちます。
