@@ -2,7 +2,7 @@
 
 [Japanese document available here / 日本語のドキュメントはこちら](README-JP.md)
 
-** Notice: Please note that this library is NOT a product of Treasure Data. At Your Own Risks please. ""  **
+**Notice: Please note that this library is NOT a product of Treasure Data. At Your Own Risks please.**
 
 ## Installation
 
