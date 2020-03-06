@@ -26,6 +26,11 @@ td.set('$global', 'td_global_id', 'td_global_id');
             targetWindow: 'self',
             tdNs: 'td',
             options: {
+                session: {
+                    enable: true,
+                    domain: 'example.com',
+                    lifetime: 1800
+                },
                 unload: {
                     enable: true
                 },

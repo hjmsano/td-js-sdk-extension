@@ -3,13 +3,13 @@
 
 
  // Wrapper for TD's optoup method
-functino optoutTd(){
+function optoutTd(){
   td.blockEvents();
 }
 
 (function() {
   function readCookie(key) {
-    return ((';' + document.cookie + ';').match(';' + key + '=([^¥S;]*)') || [])[1];
+    return ((';' + document.cookie + ';').match(';' + key + '=([^\\S;]*)') || [])[1];
   };
 
   var optoutFlag = readCookie('_td_optout');
