@@ -150,11 +150,12 @@ export default class TDExt {
             window[targetWindow].document.body,
             'click',
             clickEvent => {
-                const targetAttribute = config.options.clicks.targetAttr || 'data-trackable';
+                const targetAttribute = config.options.clicks.targetAttr || false;
                 const trackableElement = utils.queryMatch(
                     'a, button, input, [role="button"]',
                     clickEvent.target,
-                    targetAttribute
+                    targetAttribute,
+                    targetWindow
                 );
                 let element = null;
                 if (trackableElement) {
