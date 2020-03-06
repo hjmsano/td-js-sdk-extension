@@ -1,4 +1,5 @@
-let managedEvents = {}, handlerKey = 0;
+let managedEvents = {},
+    handlerKey = 0;
 
 /**
  * @ignore
@@ -14,38 +15,38 @@ export default class {
             event.initCustomEvent(config.eventName, false, false, {});
         }
 
-        window[config.targetWindow].requestAnimationFrame = window[config.targetWindow].requestAnimationFrame
-            || window[config.targetWindow].mozRequestAnimationFrame
-            || window[config.targetWindow].webkitRequestAnimationFrame;
+        window[config.targetWindow].requestAnimationFrame =
+            window[config.targetWindow].requestAnimationFrame ||
+            window[config.targetWindow].mozRequestAnimationFrame ||
+            window[config.targetWindow].webkitRequestAnimationFrame;
 
         (function recurringEvent() {
             window[config.targetWindow].requestAnimationFrame(recurringEvent);
             if (timer) {
                 return false;
             }
-            timer = setTimeout( () => {
+            timer = setTimeout(() => {
                 window[config.targetWindow].dispatchEvent(event);
                 timer = null;
             }, config.eventFrequency);
         })();
     }
 
-    addListener(element, type, listener, capture){
+    addListener(element, type, listener, capture) {
         element.addEventListener(type, listener, capture);
         managedEvents[handlerKey] = {
             element: element,
             type: type,
             listener: listener,
-            capture: capture
+            capture: capture,
         };
         return handlerKey++;
     }
 
-    removeListener(handlerKey){
+    removeListener(handlerKey) {
         if (handlerKey in managedEvents) {
             let event = managedEvents[handlerKey];
             event.element.removeEventListener(event.type, event.listener, event.capture);
         }
     }
-
 }
