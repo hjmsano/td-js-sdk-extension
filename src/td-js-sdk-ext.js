@@ -1,21 +1,23 @@
 import Events from './events';
 import Utils from './utils';
 
-const
-    extVersion = '0.1.6',
+const extVersion = '0.1.7',
     initTimestamp = +new Date();
 
-let config, targetWindow, tdNs, events, utils, unloadEvent,
-    eventHandlerKeys = {media: []},
-    prevTimestamp = +new Date();
+let config,
+    targetWindow,
+    tdNs,
+    events,
+    utils,
+    unloadEvent,
+    eventHandlerKeys = { media: [] },
+    prevTimestamp = initTimestamp;
 
 /**
  * @ignore
  */
 export default class TDExt {
-
-    constructor() {
-    }
+    constructor() {}
 
     /**
      * Initialize a page level variables.
@@ -39,36 +41,49 @@ export default class TDExt {
             events = new Events({
                 eventName: config.eventName,
                 eventFrequency: config.eventFrequency,
-                targetWindow: targetWindow
+                targetWindow: targetWindow,
             });
         }
 
         if ('performance' in window[targetWindow]) {
-            if (window[targetWindow].document.readyState === "interactive" || window[targetWindow].document.readyState === "complete") {
+            if (
+                window[targetWindow].document.readyState === 'interactive' ||
+                window[targetWindow].document.readyState === 'complete'
+            ) {
                 this.trackAction('rum', 'page', {});
             } else {
-                this.trackPerformance(targetWindow);
+                this.trackPerformance();
             }
         }
 
-        if (config.options && config.options.unload && config.options.unload.enable) {
-            this.trackUnload();
-        }
+        if (config.options) {
+            if (config.options.session && config.options.session.enable) {
+                this.sesId = utils.setSessionId({
+                    rootId: this.rootId,
+                    domain: config.options.session.domain,
+                    lifetime: config.options.session.lifetime,
+                });
+            }
 
-        if (config.options && config.options.scroll && config.options.scroll.enable) {
-            this.trackScroll();
-        }
+            if (config.options.unload && config.options.unload.enable) {
+                this.trackUnload();
+            }
 
-        if (config.options && config.options.read && config.options.read.enable) {
-            this.trackRead(config.options.read.target);
-        }
+            if (config.options.scroll && config.options.scroll.enable) {
+                this.trackScroll();
+            }
 
-        if (config.options && config.options.clicks && config.options.clicks.enable) {
-            this.trackClicks();
-        }
+            if (config.options.read && config.options.read.enable) {
+                this.trackRead(config.options.read.target);
+            }
 
-        if (config.options && config.options.media && config.options.media.enable) {
-            this.trackMedia();
+            if (config.options.clicks && config.options.clicks.enable) {
+                this.trackClicks();
+            }
+
+            if (config.options.media && config.options.media.enable) {
+                this.trackMedia();
+            }
         }
     }
 
@@ -77,21 +92,17 @@ export default class TDExt {
      *
      */
     trackAction(action = 'unknown', category = 'unknown', context = {}, successCallback, failureCallback) {
-        const
-            now = +new Date(),
+        const now = +new Date(),
             mandatory = {
                 action: action,
                 category: category,
                 root_id: this.rootId,
+                ses_id: this.sesId,
                 ext_version: extVersion,
                 since_init_ms: now - initTimestamp,
-                since_prev_ms: now - prevTimestamp
+                since_prev_ms: now - prevTimestamp,
             },
-            payload = utils.mergeObj([
-                mandatory,
-                context,
-                utils.getPerformanceInfo()
-            ]);
+            payload = utils.mergeObj([mandatory, context, utils.getPerformanceInfo()]);
         prevTimestamp = now;
         window[targetWindow][tdNs].trackEvent(config.table, payload, successCallback, failureCallback);
     }
@@ -100,15 +111,19 @@ export default class TDExt {
         this.trackAction('view', 'page', context, successCallback, failureCallback);
     }
 
-
     /**
      * Add a tracker to the onload event.
      */
     trackPerformance() {
         events.removeListener(eventHandlerKeys['performance']);
-        eventHandlerKeys['performance'] = events.addListener(window[targetWindow].document, 'DOMContentLoaded', () => {
-            this.trackAction('rum', 'page', {});
-        }, false);
+        eventHandlerKeys['performance'] = events.addListener(
+            window[targetWindow].document,
+            'DOMContentLoaded',
+            () => {
+                this.trackAction('rum', 'page', {});
+            },
+            false
+        );
     }
 
     /**
@@ -116,9 +131,14 @@ export default class TDExt {
      */
     trackUnload() {
         events.removeListener(eventHandlerKeys['unload']);
-        eventHandlerKeys['unload'] = events.addListener(window[targetWindow], unloadEvent, () => {
-            this.trackAction('unload', 'page', {});
-        }, false);
+        eventHandlerKeys['unload'] = events.addListener(
+            window[targetWindow],
+            unloadEvent,
+            () => {
+                this.trackAction('unload', 'page', {});
+            },
+            false
+        );
     }
 
     /**
@@ -126,23 +146,32 @@ export default class TDExt {
      */
     trackClicks() {
         events.removeListener(eventHandlerKeys['click']);
-        eventHandlerKeys['click'] = events.addListener(window[targetWindow].document.body, 'click', (clickEvent) => {
-            const targetAttribute = config.options.clicks.targetAttr || 'data-trackable';
-            const trackableElement = utils.queryMatch('a, button, input, [role="button"]', clickEvent.target, targetAttribute);
-            let element = null;
-            if (trackableElement) {
-                element = trackableElement.element;
-                this.trackAction('click', trackableElement.category, {
-                    click_tag: element.tagName,
-                    click_id: element.id || undefined,
-                    click_class: element.className || undefined,
-                    click_path: trackableElement.path || undefined,
-                    click_link: element.href || undefined,
-                    click_text: element.innerText || element.value || undefined,
-                    click_attr: element.dataset ? JSON.stringify(element.dataset) : undefined
-                });
-            }
-        }, false);
+        eventHandlerKeys['click'] = events.addListener(
+            window[targetWindow].document.body,
+            'click',
+            clickEvent => {
+                const targetAttribute = config.options.clicks.targetAttr || 'data-trackable';
+                const trackableElement = utils.queryMatch(
+                    'a, button, input, [role="button"]',
+                    clickEvent.target,
+                    targetAttribute
+                );
+                let element = null;
+                if (trackableElement) {
+                    element = trackableElement.element;
+                    this.trackAction('click', trackableElement.category, {
+                        click_tag: element.tagName,
+                        click_id: element.id || undefined,
+                        click_class: element.className || undefined,
+                        click_path: trackableElement.path || undefined,
+                        click_link: element.href || undefined,
+                        click_text: element.innerText || element.value || undefined,
+                        click_attr: element.dataset ? JSON.stringify(element.dataset) : undefined,
+                    });
+                }
+            },
+            false
+        );
     }
 
     /**
@@ -152,33 +181,43 @@ export default class TDExt {
         const each = config.options.scroll.granularity || 20;
         const steps = 100 / each;
         const limit = config.options.scroll.threshold * 1000 || 2 * 1000;
-        let result = {}, currentVal = 0, prevVal = 0, scrollUnit = 'percent';
+        let result = {},
+            currentVal = 0,
+            prevVal = 0,
+            scrollUnit = 'percent';
         events.removeListener(eventHandlerKeys['scroll']);
-        eventHandlerKeys['scroll'] = events.addListener(window[targetWindow], config.eventName, () => {
-            result = utils.getVisibility(null, targetWindow);
-            if (result.dIsVisible !== 'hidden' && result.dIsVisible !== 'prerender') {
-                if (config.options.scroll.unit === 'percent') {
-                    currentVal = Math.floor(result.dScrollRate * steps) * each;
-                } else {
-                    currentVal = result.dScrollUntil;
-                    scrollUnit = 'pixel';
-                }
+        eventHandlerKeys['scroll'] = events.addListener(
+            window[targetWindow],
+            config.eventName,
+            () => {
+                result = utils.getVisibility(null, targetWindow);
+                if (result.dIsVisible !== 'hidden' && result.dIsVisible !== 'prerender') {
+                    if (config.options.scroll.unit === 'percent') {
+                        currentVal = Math.floor(result.dScrollRate * steps) * each;
+                    } else {
+                        currentVal = result.dScrollUntil;
+                        scrollUnit = 'pixel';
+                    }
 
-                if ((scrollUnit === 'percent' && currentVal > prevVal && currentVal >= 0 && currentVal <= 100)
-                    || (scrollUnit === 'pixel' && currentVal > prevVal && currentVal >= each)) {
-                    setTimeout(() => {
-                        if (currentVal > prevVal) {
-                            this.trackAction('scroll', 'page', {
-                                page_height: result.dHeight,
-                                scroll_depth: currentVal,
-                                scroll_unit: scrollUnit
-                            });
-                            prevVal = (scrollUnit === 'percent') ? currentVal : currentVal + each;
-                        }
-                    }, limit);
+                    if (
+                        (scrollUnit === 'percent' && currentVal > prevVal && currentVal >= 0 && currentVal <= 100) ||
+                        (scrollUnit === 'pixel' && currentVal > prevVal && currentVal >= each)
+                    ) {
+                        setTimeout(() => {
+                            if (currentVal > prevVal) {
+                                this.trackAction('scroll', 'page', {
+                                    page_height: result.dHeight,
+                                    scroll_depth: currentVal,
+                                    scroll_unit: scrollUnit,
+                                });
+                                prevVal = scrollUnit === 'percent' ? currentVal : currentVal + each;
+                            }
+                        }, limit);
+                    }
                 }
-            }
-        }, false);
+            },
+            false
+        );
     }
 
     /**
@@ -195,30 +234,35 @@ export default class TDExt {
         const start = +new Date();
         let result, currentVal, prevVal;
         events.removeListener(eventHandlerKeys['read']);
-        eventHandlerKeys['read'] = events.addListener(window[targetWindow], config.eventName, () => {
-            currentVal = currentVal || 0;
-            prevVal = prevVal || 0;
-            result = utils.getVisibility(target, targetWindow);
-            if (result.dIsVisible !== 'hidden' && result.dIsVisible !== 'prerender' && result.tIsInView) {
-                currentVal = Math.floor(result.tScrollRate * steps) * each;
-                if (currentVal > prevVal && currentVal >= 0 && currentVal <= 100) {
-                    setTimeout(() => {
-                        if (currentVal > prevVal && target) {
-                            this.trackAction('read', 'content', {
-                                read_id: target.id || undefined,
-                                read_start_with: target.innerText.substring(0, 12) || undefined,
-                                read_target_height: result.tHeight,
-                                read_text_length: result.tLength,
-                                read_rate: currentVal,
-                                read_attr: target.dataset ? JSON.stringify(target.dataset) : undefined,
-                                read_elapsed_ms: (+new Date()) - start
-                            });
-                            prevVal = currentVal;
-                        }
-                    }, limit);
+        eventHandlerKeys['read'] = events.addListener(
+            window[targetWindow],
+            config.eventName,
+            () => {
+                currentVal = currentVal || 0;
+                prevVal = prevVal || 0;
+                result = utils.getVisibility(target, targetWindow);
+                if (result.dIsVisible !== 'hidden' && result.dIsVisible !== 'prerender' && result.tIsInView) {
+                    currentVal = Math.floor(result.tScrollRate * steps) * each;
+                    if (currentVal > prevVal && currentVal >= 0 && currentVal <= 100) {
+                        setTimeout(() => {
+                            if (currentVal > prevVal && target) {
+                                this.trackAction('read', 'content', {
+                                    read_id: target.id || undefined,
+                                    read_start_with: target.innerText.substring(0, 12) || undefined,
+                                    read_target_height: result.tHeight,
+                                    read_text_length: result.tLength,
+                                    read_rate: currentVal,
+                                    read_attr: target.dataset ? JSON.stringify(target.dataset) : undefined,
+                                    read_elapsed_ms: +new Date() - start,
+                                });
+                                prevVal = currentVal;
+                            }
+                        }, limit);
+                    }
                 }
-            }
-        }, false);
+            },
+            false
+        );
     }
 
     /**
@@ -230,23 +274,37 @@ export default class TDExt {
         let flags = {};
         for (let i = 0; i < targetEvents.length; i++) {
             events.removeListener(eventHandlerKeys['media'][targetEvents[i]]);
-            eventHandlerKeys['media'][targetEvents[i]] = events.addListener(window[targetWindow].document.body, targetEvents[i], (event) => {
-                this.trackAction(event.type, event.target.tagName.toLowerCase(), utils.getMediaInfo(event.target));
-            }, {capture: true});
+            eventHandlerKeys['media'][targetEvents[i]] = events.addListener(
+                window[targetWindow].document.body,
+                targetEvents[i],
+                event => {
+                    this.trackAction(event.type, event.target.tagName.toLowerCase(), utils.getMediaInfo(event.target));
+                },
+                { capture: true }
+            );
         }
 
         events.removeListener(eventHandlerKeys['media']['timeupdate']);
-        eventHandlerKeys['media']['timeupdate'] = events.addListener(window[targetWindow].document, 'timeupdate', (event) => {
-            if (flags[event.target.src]) {
-                return false;
-            }
-            flags[event.target.src] = setTimeout(() => {
-                if (event.target.paused !== true && event.target.ended !== true) {
-                    this.trackAction(event.type, event.target.tagName.toLowerCase(), utils.getMediaInfo(event.target));
+        eventHandlerKeys['media']['timeupdate'] = events.addListener(
+            window[targetWindow].document,
+            'timeupdate',
+            event => {
+                if (flags[event.target.src]) {
+                    return false;
                 }
-                flags[event.target.src] = false;
-            }, heartbeat * 1000);
-        }, {capture: true});
+                flags[event.target.src] = setTimeout(() => {
+                    if (event.target.paused !== true && event.target.ended !== true) {
+                        this.trackAction(
+                            event.type,
+                            event.target.tagName.toLowerCase(),
+                            utils.getMediaInfo(event.target)
+                        );
+                    }
+                    flags[event.target.src] = false;
+                }, heartbeat * 1000);
+            },
+            { capture: true }
+        );
     }
 
     /**
@@ -259,20 +317,30 @@ export default class TDExt {
         const targetEvents = ['focus', 'change'];
         for (let i = 0; i < this.trackFormTargets.length; i++) {
             let formDetail = {
-                'form_name': this.trackFormTargets[i].name || this.trackFormTargets[i].id || '-',
-                'form_attr': this.trackFormTargets[i].dataset,
-                'form_items': {}
+                form_name: this.trackFormTargets[i].name || this.trackFormTargets[i].id || '-',
+                form_attr: this.trackFormTargets[i].dataset,
+                form_items: {},
             };
             for (let j = 0; j < targetEvents.length; j++) {
                 events.removeListener(eventHandlerKeys['form'][targetEvents[j]]);
-                eventHandlerKeys['form'][targetEvents[j]] = events.addListener(this.trackFormTargets[i], targetEvents[j], (event) => {
-                    formDetail = utils.getFormStats(formDetail, targetEvents[j], event.target, initTimestamp);
-                }, true);
+                eventHandlerKeys['form'][targetEvents[j]] = events.addListener(
+                    this.trackFormTargets[i],
+                    targetEvents[j],
+                    event => {
+                        formDetail = utils.getFormStats(formDetail, targetEvents[j], event.target, initTimestamp);
+                    },
+                    true
+                );
             }
             events.removeListener(eventHandlerKeys['unload']);
-            eventHandlerKeys['unload'] = events.addListener(window[targetWindow], unloadEvent, () => {
-                this.trackAction('stats', 'form', formDetail);
-            }, false);
+            eventHandlerKeys['unload'] = events.addListener(
+                window[targetWindow],
+                unloadEvent,
+                () => {
+                    this.trackAction('stats', 'form', formDetail);
+                },
+                false
+            );
         }
     }
 }
