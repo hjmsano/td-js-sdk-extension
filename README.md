@@ -50,15 +50,28 @@ You can control what to be measured and granularity of events.
 |`targetWindow`|`self`|A frame to be observed but basically this should be `self` because TD-JS-SDK does not work in iframe properly.|
 |`tdNs`|`td`|A namespace of TD-JS-SDK object.|
 
+### Session ID support
+
+- Not a few web analyst still uses "Session" based behavior aggregation, and it requires an SQL skills if records don't have a session ID.
+- This SDK can set a session ID and collect it by setting `true` to `options.session.enable`, and you can use additional options below:
+
+|variable|example|description|
+|:---|:---|:---|
+|domain|`example.com`|A domain name to be set as an issuer of the cookie. If you want to share the cookie across multiple sub-domains, set a parent domain.|
+|lifetime|`1800`|A cookie lifetime in seconds. If the visitor does not send beacons over this value, session will be renewd on the next page.|
+
+- Note that this feature uses a cookie named `tdextSesId`.
+
 #### Time-spent on a page (unload)
 
 - Unload tracking set an eventListener to one of available events when the page is being unloaded.
 - You can get an exact time that user spent during the specific pageview.
 - In `tdext.init()`, set `true` for `options.unload.enable`.
 
-#### Clicks with data-trackable
+#### Clicks Tracking
 
 - Click tracking is triggered if the clicked element (or its parent) has the specified `data-*` attribution.
+- If you omit `options.clicks.targetAttr` but `options.clicks.enable` is `true`, Click tracking will measure clicks on elements without `data-*` attribution. 
 - In `tdext.init()`, set `true` for `options.clicks.enable` and adjust values:
 
 |variable|example|description|
