@@ -7,7 +7,7 @@ function trackerAcceptanceProcess() {
 
 (function() {
   function readCookie(key) {
-    return ((';' + document.cookie + ';').match(';' + key + '=([^\\S;]*)') || [])[1];
+    return ((';' + document.cookie + ';').match(';' + key + '=([^\S;]*)') || [])[1];
   };
 
   if (readCookie('_td_accept') === '1') {

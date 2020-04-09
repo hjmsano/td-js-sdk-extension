@@ -1,7 +1,7 @@
 import Events from './events';
 import Utils from './utils';
 
-const extVersion = '0.1.7',
+const extVersion = '0.1.8',
     initTimestamp = +new Date();
 
 let config,
