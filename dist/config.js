@@ -64,7 +64,8 @@ td.set('$global', 'td_global_id', 'td_global_id');
         // Track PV
         tdext.trackPageview();
 
-        // Custom Action
+        // Custom Action (if you want to track events other than auto-tracked, use this snippet)
+        /*
         tdext.trackAction(
             'action',
             'category',
@@ -78,5 +79,6 @@ td.set('$global', 'td_global_id', 'td_global_id');
                 console.log("failed to send data to TD.");
             }
         );
+        */
     }
 }());
